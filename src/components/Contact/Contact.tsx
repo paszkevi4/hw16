@@ -1,4 +1,6 @@
 import React from 'react';
+import male from './mars.png';
+import female from './female.png';
 import './contact.sass';
 
 //@ts-ignore
@@ -14,7 +16,10 @@ export const Contact: React.FC<ContactType> = ({ firstName, lastName, phone, gen
       </div>
 
       <div className="contact-name">{`${firstName} ${lastName}`}</div>
-      <div className="contact-phone">{phone}</div>
+      <div className="contact-phone">
+        {phone}
+        {gender === 'male' ? <img src={male} /> : gender === 'female' ? <img src={female} /> : ''}
+      </div>
     </div>
   );
 };

@@ -1,20 +1,16 @@
 import React from 'react';
 // @ts-ignore
-import { contacts } from '../state/state.ts';
+import { contacts, ContactType } from '../state/state.ts';
+import { Contact } from './Contact/Contact';
 
-type ContactType = {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  gender?: string;
-};
 interface IState {
+  showMale: boolean;
   searchValue: string | null;
   contacts: Array<ContactType>;
 }
 
 class Contacts extends React.Component<{}, IState> {
-  state = { searchValue: '', contacts: contacts };
+  state = { showMale: false, searchValue: '', contacts: contacts };
 
   pushNewContact = (newContact: ContactType): void => {
     this.setState((prevState) => {
@@ -22,27 +18,48 @@ class Contacts extends React.Component<{}, IState> {
         contacts: [...prevState.contacts, newContact],
       };
     });
-    console.log(this.state);
   };
 
-  inputHandler = (e): void => {
+  inputHandler = (e: any): void => {
     this.setState({
       searchValue: e.target.value,
     });
   };
 
-  contToSet: ContactType | null = {
+  contToSet: ContactType = {
     firstName: 'Анонімний',
     lastName: 'Анонімус',
     phone: '+380666666666',
+  };
+
+  arrange = (arr: Array<ContactType>) => {
+    let result: any = [];
+    const sortByFirstName = (arr: Array<ContactType>): Array<ContactType> => {
+      return arr.sort((a: ContactType, b: ContactType) => (a.firstName > b.firstName ? 1 : -1));
+    };
+    const showMale = (arr: Array<ContactType>): Array<ContactType> => {
+      return arr.filter((contact) => contact.gender === 'male');
+    };
+    const showFemale = (arr: Array<ContactType>): Array<ContactType> => {
+      return arr.filter((contact) => contact.gender === 'female');
+    };
+    const showNotGiven = (arr: Array<ContactType>): Array<ContactType> => {
+      return arr.filter((contact) => !contact.gender);
+    };
+
+    this.state.showMale ? (result = [...result, ...showMale(arr)]) : (result = result);
+    result = [...result, ...showFemale(arr)];
+    result = [...result, ...showNotGiven(arr)];
+    result = sortByFirstName(result);
+    return result;
   };
 
   render() {
     return (
       <div>
         <input value={this.state.searchValue} onChange={this.inputHandler} />
-        {this.state.contacts.map((el) => {
-          return <div>{el.firstName}</div>;
+        {this.arrange(this.state.contacts).map((el: ContactType, i: number) => {
+          return <Contact key={i} {...el} />;
         })}
         <button
           onClick={() => {
